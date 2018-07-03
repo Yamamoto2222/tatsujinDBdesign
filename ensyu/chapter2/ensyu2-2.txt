@@ -1,0 +1,11 @@
+演習2-2　ハードウェアリソースの情報取得
+【問題文】
+ハードウェアのサイジングを行うには、現行システムのハードウェアリソースの情報が欠かせません。これを取得するためのOSコマンドを、OS別に調べて整理してください。
+
+【解答】
+参照サイト：http://tech.nikkeibp.co.jp/it/atcl/column/15/042000103/080600057/
+windows：systeminfo
+MacOS：hostinfo
+linux
+　CPU：lscpu
+　メモリ：cat /proc/meminfo
