@@ -1,7 +1,220 @@
-演習5-1　
+演習5-1　正規化されたテーブルに対するSQL
 【問題文】
+この演習で利用するテーブルは第3章の演習問題の解答を含むため、未解答の方はまず先に演習3-3（122ページ）に取り組んでください。
+さて、この演習では、演習3-3で正規化した以下の5つのテーブルについて考えていきます。
 
+・支社テーブル
+┌─────────┐
+│支社コード│支社名│
+│─────┼───│
+│001　　　 │東京　│
+│002　　　 │大阪　│
+└─────────┘
+
+・支店テーブル
+┌───────────────┐
+│支社コード│支店コード│支店名│
+│─────┼─────┼───│
+│001　　　 │01　　　　│渋谷　│
+│001　　　 │02　　　　│八重洲│
+│002　　　 │01　　　　│堺　　│
+│002　　　 │02　　　　│豊中　│
+└───────────────┘
+
+・商品テーブル
+┌──────────────────┐
+│商品コード│商品名　│商品分類コード│
+│─────┼────┼───────│
+│001　　　 │石鹸　　│C1　　　　　　│
+│002　　　 │タオル　│C1　　　　　　│
+│003　　　 │ハブラシ│C1　　　　　　│
+│004　　　 │コップ　│C1　　　　　　│
+│005　　　 │箸　　　│C2　　　　　　│
+│006　　　 │スプーン│C2　　　　　　│
+│007　　　 │雑誌　　│C3　　　　　　│
+│008　　　 │爪切り　│C4　　　　　　│
+└──────────────────┘
+
+・商品分類テーブル
+┌────────────┐
+│商品分類コード│分類名　│
+│───────┼────│
+│C1　　　　　　│水洗用品│
+│C2　　　　　　│食器　　│
+│C3　　　　　　│雑誌　　│
+│C4　　　　　　│日用雑貨│
+└────────────┘
+
+・支店商品テーブル
+┌─────────────────┐
+│支社コード│支店コード│商品コード│
+│─────┼─────┼─────│
+│001　　　 │01　　　　│001　　　 │
+│001　　　 │01　　　　│002　　　 │
+│001　　　 │01　　　　│003　　　 │
+│001　　　 │02　　　　│002　　　 │
+│001　　　 │02　　　　│003　　　 │
+│001　　　 │02　　　　│004　　　 │
+│001　　　 │02　　　　│005　　　 │
+│001　　　 │02　　　　│006　　　 │
+│002　　　 │01　　　　│001　　　 │
+│002　　　 │01　　　　│002　　　 │
+│002　　　 │02　　　　│007　　　 │
+│002　　　 │02　　　　│008　　　 │
+└─────────────────┘
+
+上記5つのテーブルから、以下の要件を満たす結果を得るためのSQL文を考えてください。なお、テーブル名、列名、でーあの値は上記のテーブルのものを使用するものとします。
+・SQL文1
+　商品分類ごとの商品数。結果には分類名を含むものとする。
+
+・SQL文2
+　支社/支店別の取り扱い商品の一覧。結果には支社名、支店名、商品名を含むものとする
+
+・SQL文3
+　最も取り扱い商品数が多い視点の支店コードと商品数。
 
 【解答】
+・SQL文1
+　SELECT 商品分類テーブル.商品分類コード, 商品分類テーブル.分類名, 商品テーブル.COUNT(*)
+　FROM 商品分類テーブル
+　  LEFT JOIN 商品テーブル ON 商品分類テーブル.商品分類コード = 商品テーブル.商品分類コード
+　  GROUP BY 商品分類コード, 商品分類テーブル.分類名
+
+【物理SQL】
+SELECT
+  chapter3_item_category.item_category_code as 商品分類コード
+  , chapter3_item_category.item_name as 分類名
+  , count(*) as 商品数
+FROM chapter3_item_category
+LEFT JOIN chapter3_item
+  ON chapter3_item_category.item_category_code = chapter3_item.item_category_code
+GROUP BY
+  chapter3_item_category.item_category_code,chapter3_item_category.item_name;
+
+【実行結果】
+ 商品分類コード |  分類名  | 分類名
+----------------+----------+--------
+ C4             | 日用雑貨 |      1
+ C1             | 水洗用品 |      4
+ C2             | 食器     |      2
+ C3             | 雑誌     |      1
+(4 行)
 
 
+時間: 2.641 ms
+
+・SQL文2
+　SELECT 支社テーブル.支社名, 支店テーブル.支店名, 商品テーブル.商品名
+　FROM 支社
+　  LEFT JOIN 支店テーブル
+　    ON 支社テーブル.支社コード = 支店テーブル.支社コード
+　  LEFT JOIN 支店商品テーブル
+　    ON 支店テーブル.支社コード = 支店商品テーブル.支社コード
+　    AND
+　     支店テーブル.支店コード = 支店商品テーブル.支店コード
+　  LEFT JOIN 商品テーブル
+　    ON 支店商品テーブル.商品コード = 商品テーブル.商品コード
+
+【物理SQL】
+SELECT 
+  chapter3_company.company_name as 支社名
+  , chapter3_store.store_name as 支店名
+  , chapter3_item.item_name as 商品名
+FROM chapter3_company
+  LEFT JOIN chapter3_store
+    ON chapter3_company.company_code = chapter3_store.company_code
+  LEFT JOIN chapter3_store_item
+    ON chapter3_store.company_code = chapter3_store_item.company_code
+    AND 
+    chapter3_store.store_code = chapter3_store_item.store_code
+  LEFT JOIN chapter3_item
+    ON chapter3_store_item.item_code = chapter3_item.item_code
+
+【実行結果】
+ 支社名 | 支店名 |  商品名
+--------+--------+----------
+ 東京   | 渋谷   | 石鹸
+ 東京   | 渋谷   | タオル
+ 東京   | 渋谷   | ハブラシ
+ 東京   | 八重洲 | タオル
+ 東京   | 八重洲 | ハブラシ
+ 東京   | 八重洲 | コップ
+ 東京   | 八重洲 | 箸
+ 東京   | 八重洲 | スプーン
+ 大阪   | 堺     | 石鹸
+ 大阪   | 堺     | タオル
+ 大阪   | 豊中   | 雑誌
+ 大阪   | 豊中   | 爪切り
+(12 行)
+
+時間: 4.250 ms
+
+
+・SQL文3
+　SELECT 支社コード, 支店コード、商品数
+　FROM （
+　  SELECT 支社コード, 支店コード, COUNT(*) as 商品数
+　  FROM 支店商品テーブル
+　  GROUP BY 支社コード, 支店コード
+　) as 支店商品数
+　ORDER BY 商品数 DESC
+　LIMIT 1;
+　
+【物理SQL】
+SELECT 
+  company_code as 支社コード
+  , store_code as 支店コード
+  , count_item as 商品数
+ FROM (
+   SELECT company_code, store_code, COUNT(*) as count_item
+   FROM chapter3_store_item
+   GROUP BY company_code, store_code
+ ) as store_item_list
+ ORDER BY count_item DESC
+ LIMIT 1;
+
+【実行結果】
+支社コード | 支店コード | 商品数
+------------+------------+--------
+ 001        | 02         |      5
+(1 行)
+
+時間: 3.348 ms
+
+
+【テキスト解答】
+SELECT 
+  t_store.company_code as 支社コード
+  , t_store.store_code as 支店コード
+  , COUNT(*) as 商品数
+FROM
+  chapter3_store as t_store
+  INNER JOIN
+    chapter3_store_item as t_store_item
+    ON t_store.store_code = t_store_item.store_code
+      AND t_store.company_code = t_store_item.company_code
+  GROUP BY t_store.company_code, t_store.store_code
+HAVING COUNT(*) >= (
+  SELECT 
+    MAX(item_count)
+  FROM (
+   SELECT
+     chapter3_store.company_code,
+     chapter3_store.store_code,
+     COUNT(*) as item_count
+   FROM chapter3_store INNER JOIN chapter3_store_item
+     ON chapter3_store.store_code = chapter3_store_item.store_code
+     AND chapter3_store.company_code = chapter3_store_item.company_code
+   GROUP BY chapter3_store.company_code, chapter3_store.store_code
+  )
+  TMP
+);
+
+【実行結果】
+ 支社コード | 支店コード | 商品数
+------------+------------+--------
+ 001        | 02         |      5
+(1 行)
+
+
+時間: 3.966 ms
