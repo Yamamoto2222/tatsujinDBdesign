@@ -1,0 +1,38 @@
+演習6-2　インデックスの再編成
+【問題文】
+「B-treeインデックスに関するその他の注意事項」（178ページ）で、B-treeインデックスでは更新が発生することで時間とともに構造が崩れ、性能が劣化することを説明しました。これを防止するためにインデックスの再編成が必要になります。再編成を実施するための具体的な方法を、DBMSごとに調べてください。
+
+【解答】
+■SQL Server
+参照サイト：https://www.projectgroup.info/tips/SQLServer/SQL/SQL000023.html
+
+・ひとつのインデックスの再構築
+ALTER INDEX ＜インデックス名＞ REBUILD
+・テーブルのインデックスの再構築
+ALTER INDEX ALL ON ＜テーブル名＞ REBUILD
+
+
+■Oracle
+参照サイト：https://sql-oracle.com/?p=275
+-- Oracleのインデックスの状態を確認する
+SELECT INDEX_NAME,TABLE_OWNER,TABLE_NAME,STATUS FROM USER_INDEXES
+
+・インデックス名から再構築
+alter index インデックス名 rebuild;
+
+
+■mySQL
+参照サイト：https://hogem.hatenablog.com/entry/20100106/1262780069
+インデックスを削除する
+alter table table_name drop index index_name;
+drop index index_name on table_name;
+
+インデックスを作成する
+alter table table_name add index index_name(index_col_name);
+create index index_name on table_name (index_col_name);
+
+
+■postgresSQL
+参照サイト：https://www.postgresql.jp/document/9.2/html/sql-reindex.html
+インデックスを再構築する
+REINDEX { INDEX | TABLE | DATABASE | SYSTEM } name [ FORCE ]
