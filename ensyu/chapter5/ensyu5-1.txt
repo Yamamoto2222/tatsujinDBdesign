@@ -71,7 +71,7 @@
 　支社/支店別の取り扱い商品の一覧。結果には支社名、支店名、商品名を含むものとする
 
 ・SQL文3
-　最も取り扱い商品数が多い視点の支店コードと商品数。
+　最も取り扱い商品数が多い支店の支店コードと商品数。
 
 【解答】
 ・SQL文1
@@ -160,7 +160,7 @@ FROM chapter3_company
 　ORDER BY 商品数 DESC
 　LIMIT 1;
 　
-【物理SQL】
+【物理SQL】※1件しか取得しないので複数存在した時にバグとなる
 SELECT 
   company_code as 支社コード
   , store_code as 支店コード
@@ -180,6 +180,30 @@ SELECT
 (1 行)
 
 時間: 3.348 ms
+
+
+【修正解答】
+SELECT 
+  company_code as 支社コード
+  , store_code as 支店コード
+  , COUNT(*) as 商品数
+FROM chapter3_store_item
+GROUP BY company_code, store_code
+HAVING COUNT(*) = (
+ SELECT MAX(ite_count) FROM ( 
+   SELECT COUNT(*) as ite_count
+   FROM chapter3_store_item
+   GROUP BY company_code, store_code
+ ) as item_list
+);
+
+【修正解答　実行結果】
+ 支社コード | 支店コード | 商品数
+------------+------------+--------
+ 001        | 02         |      5
+(1 行)
+
+時間: 2.645 ms
 
 
 【テキスト解答】
