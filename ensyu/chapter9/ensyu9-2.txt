@@ -1,0 +1,40 @@
+演習9-2　実数のデータ型
+
+【問題文】
+入れ子区間モデルの「左端」および「右端」の列を実装するためのデータ型を、
+以下のDBMSの最新バージョンについて調べなさい。
+
+・Oracle
+・SQLServer
+・DB2
+・PostgreSQL
+・MySQL
+
+【解答】
+・Oracle
+バージョン：18c
+データ型：float
+（FLOATデータ型は、2進精度bを持つ浮動小数点数です。このデータ型のデフォルト精度は、126桁の2進精度または38桁の10進精度です。）
+参照サイト：http://otndnld.oracle.co.jp/document/products/oracle10g/102/doc_cd/server.102/B19196-02/sqlqr06.htm
+
+・SQLServer
+バージョン：Microsoft SQL Server 2018 Standard Edition
+データ型：float
+参照サイト：https://msdn.microsoft.com/ja-jp/library/ms173773(v=sql.120).aspx
+
+・DB2
+バージョン：DB2 for Linux, UNIX and Windows 9.7, 10.1
+データ型：double
+参照サイト：https://www.ibm.com/support/knowledgecenter/ja/SSEPEK_10.0.0/intro/src/tpc/db2z_numericdatatypes.html
+
+・PostgreSQL
+バージョン：PostgreSQL 9.2.24、9.3.23、9.4.18、9.5.13、9.6.9、10.4 
+データ型：double precision
+参照サイト：https://www.postgresql.jp/document/8.2/html/datatype-numeric.html
+
+・MySQL
+バージョン：MySQL 5.1.73、5.5.60、5.6.40、5.7.22、8.0.11
+データ型：float
+参照サイト：https://dev.mysql.com/doc/refman/5.6/ja/floating-point-types.html
+
+
